@@ -1,0 +1,40 @@
+name: MEMORY OMEGA Canary
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "worker/memory_canary.py"
+      - ".github/workflows/memory-canary.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  memory-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run F120 memory governor canary
+        run: python worker/memory_canary.py
+      - name: Verify artifact
+        run: |
+          test -s artifacts/memory_record.json
+          python - <<'PY'
+          import json
+          p="artifacts/memory_record.json"
+          d=json.load(open(p))
+          assert d["schema"]=="MEMORY_OMEGA_V1"
+          assert d["farm"]==120
+          assert d["role"]=="MEMORY_GOVERNOR"
+          assert d["status"]=="PASS"
+          assert len(d["sha256"])==64
+          print("F120_CANARY_VERIFIED", d["memory_id"], d["sha256"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: f120-memory-canary
+          path: artifacts/memory_record.json
+          if-no-files-found: error
+          retention-days: 7
