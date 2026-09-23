@@ -1,0 +1,12 @@
+name: CEREBRON F120 MEMORY OMEGA canary
+on: [push, workflow_dispatch]
+jobs:
+  memory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python worker/memory_node.py
+      - uses: actions/upload-artifact@v4
+        with: {name: f120-memory-node, path: artifacts/node.json, retention-days: 1}
