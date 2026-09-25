@@ -1,0 +1,61 @@
+{
+  "schema": "F120_RDX_MEMORY_GOVERNOR_CANARY_V1",
+  "status": "PASS",
+  "farm_id": 120,
+  "role": "MEMORY_GOVERNOR",
+  "inputs": {
+    "f72_state": {
+      "repo": "dmaillot95-ui/cerebron-farm-72-reality-evidence-gate",
+      "commit": "d2ca8fbad1e837f2da641a24aa74b49e795af0ff",
+      "path": "agora/state.json"
+    },
+    "scoped_review": {
+      "repo": "dmaillot95-ui/cerebron-farm-72-reality-evidence-gate",
+      "commit": "2ccb94d3161658499fe2c8cbce2313839645290b",
+      "path": "receipts/rdx-memory-evidence-review-36149593919.json",
+      "result_sha256": "3b925348d4a04b11ff54d5472a5a3cd52b83af10ea188c8c50222b341caf5aee"
+    }
+  },
+  "decisions": {
+    "RDX_M1_M7_MEMORY": "ALLOW_WITH_PROVENANCE",
+    "M4_GOLD": "BLOCK_BY_GLOBAL_F72",
+    "M6_TRAINING": "DENY",
+    "RDX_NEURAL_TRAINING": "DENY_UNTIL_GLOBAL_F72_AND_AFAH_AND_GOLD",
+    "SECRETS_TRAINING": "NEVER_TRAIN"
+  },
+  "quota_thresholds_percent": {
+    "warning": 70,
+    "reinforcement": 80,
+    "stop": 90,
+    "drain_freeze": 95
+  },
+  "quota_probe": {
+    "0": "NORMAL",
+    "69": "NORMAL",
+    "70": "WARNING",
+    "79": "WARNING",
+    "80": "REINFORCEMENT",
+    "89": "REINFORCEMENT",
+    "90": "STOP",
+    "94": "STOP",
+    "95": "DRAIN_FREEZE",
+    "100": "DRAIN_FREEZE"
+  },
+  "checks": {
+    "global_f72_fail": true,
+    "scoped_review_pass": true,
+    "scoped_receipt_sha": true,
+    "scoped_does_not_release_global": true,
+    "gold_locked": true,
+    "training_locked": true,
+    "m6_training_deny": true,
+    "quota_70_warning": true,
+    "quota_80_reinforcement": true,
+    "quota_90_stop": true,
+    "quota_95_drain_freeze": true
+  },
+  "training_executed": false,
+  "weights_changed": false,
+  "claim_ceiling": "RDX_MEMORY_GOVERNOR_POLICY_CANARY_ONLY_NO_GOLD_RELEASE_NO_TRAINING",
+  "receipt_sha256": "13feaef4cb14852625b3dae7c0f2c40a9d20b4697d21ac253b931dffd16aac31"
+}
