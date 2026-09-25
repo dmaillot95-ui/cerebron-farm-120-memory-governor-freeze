@@ -1,0 +1,49 @@
+name: CEREBRON F120 RDX Memory Governor Canary
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'config/rdx-memory-governor-canary-trigger.txt'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Run RDX memory governor canary
+        run: python worker/rdx_memory_governor_canary.py
+      - name: Verify fail-closed decisions
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          d=json.loads(pathlib.Path("artifacts/rdx_memory_governor_canary.json").read_text())
+          assert d["status"]=="PASS"
+          assert d["decisions"]["M4_GOLD"]=="BLOCK_BY_GLOBAL_F72"
+          assert d["decisions"]["M6_TRAINING"]=="DENY"
+          assert d["decisions"]["RDX_NEURAL_TRAINING"]=="DENY_UNTIL_GLOBAL_F72_AND_AFAH_AND_GOLD"
+          assert d["training_executed"] is False
+          assert d["weights_changed"] is False
+          assert all(d["checks"].values())
+          print("F120_RDX_MEMORY_GOVERNOR=PASS",d["receipt_sha256"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: f120-rdx-memory-governor-canary
+          path: artifacts/rdx_memory_governor_canary.json
+          if-no-files-found: error
+      - name: Persist receipt
+        run: |
+          mkdir -p receipts
+          cp artifacts/rdx_memory_governor_canary.json receipts/rdx-memory-governor-canary-${{ github.run_id }}.json
+          git config user.name cerebron-bot
+          git config user.email actions@users.noreply.github.com
+          git add receipts/rdx-memory-governor-canary-${{ github.run_id }}.json
+          git diff --cached --quiet && exit 0
+          git commit -m "receipt: F120 RDX memory governor canary ${{ github.run_id }}"
+          git pull --rebase origin main
+          git push
