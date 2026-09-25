@@ -1,0 +1,6 @@
+F120 RDX MEMORY GOVERNOR CANARY V1
+source_f72_global=FAIL
+source_scoped_run=36149593919
+m6_training=DENY
+gold=BLOCKED
+training=false
