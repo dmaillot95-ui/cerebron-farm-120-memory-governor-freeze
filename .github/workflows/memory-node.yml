@@ -1,5 +1,10 @@
 name: CEREBRON F120 MEMORY OMEGA canary
-on: [push, workflow_dispatch]
+on:
+  push:
+    paths:
+      - 'worker/memory_node.py'
+      - '.github/workflows/memory-node.yml'
+  workflow_dispatch:
 jobs:
   memory:
     runs-on: ubuntu-latest
